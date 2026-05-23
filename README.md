@@ -6,7 +6,3 @@ A Kubernetes operator written in Go that intercepts Pod creation at **Admission 
 1. **Mutating Admission Webhook**: Intercepts Pod admission requests, injects topology nodeAffinity policies, and routes them to our custom scheduler.
 2. **Custom Controller**: Periodically queries node metrics from `metrics.k8s.io` (provided by Metrics Server) and updates Node annotations with health scores, utilization scores, and zone/rack information.
 3. **Custom Scheduler Plugin**: A Kubernetes scheduler plugin that filters and scores nodes based on zone/rack topology, hardware capabilities, and real-time CPU/memory utilization.
-
-## Development Setup
-
-See `ai-docs/implementation_plan.md` for a detailed breakdown of the architecture, implementation steps, and local testing configuration.
