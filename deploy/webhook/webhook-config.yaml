@@ -1,0 +1,33 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: topology-mutating-webhook
+webhooks:
+  - name: topology-webhook.topology-system.svc
+    admissionReviewVersions: ["v1"]    # We handle AdmissionReview v1
+    sideEffects: None                   # Our webhook has no side effects
+    failurePolicy: Ignore              # Fail-open: if webhook is down, allow Pod through
+    timeoutSeconds: 5                   # Don't block API server for more than 5s
+
+    clientConfig:
+      # Tell the API server WHERE to send the AdmissionReview
+      service:
+        name: topology-webhook
+        namespace: topology-system
+        path: /mutate                  # Our HTTP endpoint
+        port: 443
+      caBundle: CA_BUNDLE_PLACEHOLDER   # Replaced by setup script with base64-encoded CA cert
+
+    rules:
+      # Tell the API server WHEN to trigger this webhook
+      - operations: ["CREATE"]          # Only on Pod creation
+        apiGroups: [""]                 # Core API group
+        apiVersions: ["v1"]
+        resources: ["pods"]
+
+    # Don't trigger on system namespaces (avoids infinite loops)
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "topology-system"]

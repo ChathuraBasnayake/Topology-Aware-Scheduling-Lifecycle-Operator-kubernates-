@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: topology-webhook
+  namespace: topology-system
+  labels:
+    app: topology-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: topology-webhook
+  template:
+    metadata:
+      labels:
+        app: topology-webhook
+    spec:
+      containers:
+        - name: webhook
+          image: topology-operator/webhook:latest
+          imagePullPolicy: Never           # Use locally loaded image (Kind)
+          ports:
+            - containerPort: 8443
+              name: https
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: webhook-tls        # Created by setup script

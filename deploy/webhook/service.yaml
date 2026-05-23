@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: topology-webhook
+  namespace: topology-system
+spec:
+  selector:
+    app: topology-webhook
+  ports:
+    - port: 443              # API server connects to port 443
+      targetPort: 8443       # Our container listens on 8443
+      protocol: TCP

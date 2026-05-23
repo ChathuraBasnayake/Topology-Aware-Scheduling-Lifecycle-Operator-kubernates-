@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-KIND_CLUSTER="topology-test"
+KIND_CLUSTER="desktop"
 
 # Detect kind binary path
 KIND_BIN="kind"
@@ -43,16 +43,18 @@ fi
 
 echo "Using kind binary: ${KIND_BIN}"
 
-
 echo "=== 1. Checking if cluster already exists ==="
 if "${KIND_BIN}" get clusters | grep -q "^${KIND_CLUSTER}$"; then
-  echo "Deleting existing cluster ${KIND_CLUSTER}..."
-  "${KIND_BIN}" delete cluster --name "${KIND_CLUSTER}"
+  echo "Cluster '${KIND_CLUSTER}' is already running. Skipping creation and using existing cluster."
+else
+  echo "=== 2. Creating Kind Cluster ==="
+  "${KIND_BIN}" create cluster --config deploy/kind/kind-config.yaml --name "${KIND_CLUSTER}"
 fi
 
-echo "=== 2. Creating Kind Cluster ==="
-"${KIND_BIN}" create cluster --config deploy/kind/kind-config.yaml --name "${KIND_CLUSTER}"
-
+echo "=== 2. Labeling worker nodes with topology ==="
+kubectl label node desktop-worker topology.kubernetes.io/zone=us-east-1a topology.kubernetes.io/rack=rack-a --overwrite
+kubectl label node desktop-worker2 topology.kubernetes.io/zone=us-east-1b topology.kubernetes.io/rack=rack-b --overwrite
+kubectl label node desktop-worker3 topology.kubernetes.io/zone=us-east-1a topology.kubernetes.io/rack=rack-a --overwrite
 
 echo "=== 3. Deploying Metrics Server ==="
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
@@ -70,3 +72,4 @@ bash deploy/certs/generate-certs.sh
 
 echo "=== Setup Complete! ==="
 echo "You can verify metrics are active with 'kubectl top nodes' in a minute."
+
