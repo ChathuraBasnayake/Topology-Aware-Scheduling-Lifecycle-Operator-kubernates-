@@ -12,10 +12,10 @@ rules:
   # Standard scheduler permissions
   - apiGroups: [""]
     resources: ["endpoints", "configmaps"]
-    verbs: ["create", "get", "update"]
+    verbs: ["create", "get", "list", "watch", "update"]
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
-    verbs: ["create", "get", "update"]
+    verbs: ["create", "get", "update", "list", "watch"]
   - apiGroups: [""]
     resources: ["events"]
     verbs: ["create", "patch", "update"]
@@ -41,7 +41,10 @@ rules:
     resources: ["poddisruptionbudgets"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["storage.k8s.io"]
-    resources: ["storageclasses", "csinodes", "csidrivers", "csistoragecapacities"]
+    resources: ["storageclasses", "csinodes", "csidrivers", "csistoragecapacities", "volumeattachments"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["resource.k8s.io"]
+    resources: ["deviceclasses", "resourceslices", "resourceclaims"]
     verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
