@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: topology-scheduler
+  namespace: topology-system
+  labels:
+    app: topology-scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: topology-scheduler
+  template:
+    metadata:
+      labels:
+        app: topology-scheduler
+    spec:
+      serviceAccountName: topology-scheduler
+      containers:
+        - name: scheduler
+          image: topology-operator/scheduler:latest
+          imagePullPolicy: Never           # Use locally loaded image (Kind/Docker-Desktop)
+          command:
+            - /scheduler
+            - --config=/etc/kubernetes/scheduler/scheduler-config.yaml
+            - --v=2
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/kubernetes/scheduler
+      volumes:
+        - name: config-volume
+          configMap:
+            name: scheduler-config
