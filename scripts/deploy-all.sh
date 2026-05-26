@@ -44,3 +44,13 @@ echo "Waiting for Webhook to be ready..."
 kubectl rollout status deployment/topology-webhook -n "${NAMESPACE}" --timeout=60s
 
 echo "=== Webhook Deployment Done ==="
+
+echo "=== 4. Deploying Custom Controller ==="
+kubectl apply -f deploy/controller/rbac.yaml
+kubectl apply -f deploy/controller/deployment.yaml
+
+echo "Waiting for Custom Controller to be ready..."
+kubectl rollout status deployment/topology-controller -n "${NAMESPACE}" --timeout=60s
+
+echo "=== Custom Controller Deployment Done ==="
+

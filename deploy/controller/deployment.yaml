@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: topology-controller
+  namespace: topology-system
+  labels:
+    app: topology-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: topology-controller
+  template:
+    metadata:
+      labels:
+        app: topology-controller
+    spec:
+      serviceAccountName: topology-controller
+      containers:
+        - name: controller
+          image: topology-operator/controller:latest
+          imagePullPolicy: Never           # Use locally loaded image (Kind/Docker-Desktop)
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

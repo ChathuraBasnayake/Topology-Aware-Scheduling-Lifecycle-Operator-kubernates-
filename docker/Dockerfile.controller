@@ -8,10 +8,10 @@ RUN go mod download
 
 # Copy source code and build
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /webhook ./cmd/webhook/
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /controller ./cmd/controller/
 
 # Stage 2: Minimal runtime image
 FROM gcr.io/distroless/static:nonroot
-COPY --from=builder /webhook /webhook
+COPY --from=builder /controller /controller
 USER nonroot:nonroot
-ENTRYPOINT ["/webhook"]
+ENTRYPOINT ["/controller"]
