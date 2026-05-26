@@ -1,8 +1,22 @@
 // Package main starts the custom kube-scheduler binary with the
 // TopologyAwarePlacement plugin registered.
-// This file will be fully implemented in Step 11.
 package main
 
+import (
+	"os"
+
+	"github.com/topology-operator/pkg/scheduler"
+	"k8s.io/component-base/cli"
+	"k8s.io/kubernetes/cmd/kube-scheduler/app"
+)
+
 func main() {
-	// TODO: Step 11 — NewSchedulerCommand with WithPlugin, cli.Run
+	// Create the kube-scheduler command registering our custom plugin
+	command := app.NewSchedulerCommand(
+		app.WithPlugin(scheduler.Name, scheduler.New),
+	)
+
+	// Run the scheduler CLI command
+	code := cli.Run(command)
+	os.Exit(code)
 }
