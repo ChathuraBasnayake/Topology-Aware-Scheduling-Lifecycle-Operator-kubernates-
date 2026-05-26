@@ -54,3 +54,12 @@ kubectl rollout status deployment/topology-controller -n "${NAMESPACE}" --timeou
 
 echo "=== Custom Controller Deployment Done ==="
 
+echo "=== 5. Deploying Custom Scheduler ==="
+kubectl apply -f deploy/scheduler/configmap.yaml
+kubectl apply -f deploy/scheduler/rbac.yaml
+kubectl apply -f deploy/scheduler/deployment.yaml
+
+echo "Waiting for Custom Scheduler to be ready..."
+kubectl rollout status deployment/topology-scheduler -n "${NAMESPACE}" --timeout=60s
+
+echo "=== Custom Scheduler Deployment Done ==="
